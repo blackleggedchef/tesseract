@@ -67,7 +67,7 @@ RUN git clone ${LEP_REPO_URL} ${LEP_SRC_DIR} && \
     ldconfig
 
 RUN git clone ${TES_REPO_URL} ${TES_SRC_DIR} && \
-    cd ${TES_SRC_DIR} && git checkout ${TESSERACT_CHECKOUT} && \
+    cd ${TES_SRC_DIR} && git checkout ${TESSERACT_CHECKOUT} 
     
 WORKDIR /home
 
