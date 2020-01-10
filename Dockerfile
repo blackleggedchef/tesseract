@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 MAINTAINER Raghav Gupta <raghavg96@gmail.com>
-RUN apt-get update && apt-get install -y software-properties-common
-RUN apt-get install -y gcc gdb libc6-dbg gdb valgrind
+RUN apt-get update && apt-get install -y software-properties-common 
+RUN apt-get install -y g++ gcc gdb libc6-dbg gdb valgrind
 RUN apt-get install -y vim git cmake tmux screen
 
 ARG INSTALL_LOCATION='/usr/local'
@@ -30,7 +30,6 @@ RUN apt-get install -y \
 	automake \
 	build-essential \
 	checkinstall \
-	g++ \
 	libcairo2-dev \
 	libicu-dev \
 	libjpeg-dev \
