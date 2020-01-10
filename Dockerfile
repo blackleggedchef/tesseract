@@ -67,6 +67,15 @@ RUN git clone ${LEP_REPO_URL} ${LEP_SRC_DIR} && \
 
 RUN git clone ${TES_REPO_URL} ${TES_SRC_DIR} && \
     cd ${TES_SRC_DIR} && git checkout ${TESSERACT_CHECKOUT} 
+
+# osd	Orientation and script detection
+RUN wget -O ${TESSDATA_PREFIX}/osd.traineddata https://github.com/tesseract-ocr/tessdata/raw/3.04.00/osd.traineddata
+
+# equ	Math / equation detection
+RUN wget -O ${TESSDATA_PREFIX}/equ.traineddata https://github.com/tesseract-ocr/tessdata/raw/3.04.00/equ.traineddata
+
+# eng English
+RUN wget -O ${TESSDATA_PREFIX}/eng.traineddata https://github.com/tesseract-ocr/tessdata/raw/4.00/eng.traineddata
     
 WORKDIR /home
 
