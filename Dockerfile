@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 MAINTAINER Raghav Gupta <raghavg96@gmail.com>
 RUN apt-get update && apt-get install -y software-properties-common 
 RUN apt-get install -y g++ gcc gdb libc6-dbg gdb valgrind
-RUN apt-get install -y vim git cmake tmux screen
+RUN apt-get install -y vim git cmake tmux screen python
 
 ARG INSTALL_LOCATION='/usr/local'
 ARG SETUP_LOCATION='/tmp/setup'
@@ -10,9 +10,12 @@ ARG CPU_CORE=4
 
 RUN mkdir -p ${INSTALL_LOCATION}
 
+ARG G3LOG_REPO='https://github.com/KjellKod/g3log.git'
+ARG G3LOG_CHECKOUT='tags/1.3.2'
 ARG OPENCV_REPO='https://github.com/opencv/opencv.git'
 ARG OPENCV_CHECKOUT='3.4'
 
+#install openCV
 ARG OPENCV_SETUP_PATH=${SETUP_LOCATION}'/OPENCV'
 RUN apt-get install -y libssl-dev && \
     git clone ${OPENCV_REPO} ${OPENCV_SETUP_PATH} && \
@@ -23,6 +26,20 @@ RUN apt-get install -y libssl-dev && \
     make install && \
     ldconfig && \
     rm -rf ${OPENCV_SETUP_PATH}
+
+# install g3log
+ARG G3LOG_SETUP_PATH=${SETUP_LOCATION}'/G3LOG'
+RUN apt-get install -y libjsoncpp-dev autoconf automake libtool curl make g++ unzip && \
+    git clone ${G3LOG_REPO} ${G3LOG_SETUP_PATH} && \
+    cd ${G3LOG_SETUP_PATH} && git checkout ${G3LOG_CHECKOUT} && git submodule update --init --recursive && \
+    cd 3rdParty/gtest && unzip -u -o gtest-1.7.0.zip && cd ../../ && \
+    mkdir -p ./cmake_build && cd ./cmake_build && \
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DCPACK_PACKAGING_INSTALL_PREFIX=${INSTALL_LOCATION} && \
+    make -j${CPU_CORE} package && \
+    make install && \
+    ldconfig && \
+    rm -rf ${G3LOG_SETUP_PATH}
+
 
 RUN apt-get install -y \
 	autoconf \
@@ -45,28 +62,10 @@ RUN apt-get install -y \
 	xzgv \
 	zlib1g-dev
 
-ENV BASE_DIR /home/workspace
-ENV LEP_SRC_DIR ${BASE_DIR}/leptonica
-ENV LEP_REPO_URL https://github.com/DanBloomberg/leptonica.git
-ENV TES_SRC_DIR ${BASE_DIR}/tesseract
-ENV TES_REPO_URL https://github.com/tesseract-ocr/tesseract.git
-ENV TESSDATA_PREFIX /usr/local/share/tessdata
 
-ARG TESSERACT_CHECKOUT='75103040c94ffd7fe5e4e3dfce0a7e67a8420849'
-ARG LEPTONICA_CHECKOUT='1.78.0'
-RUN mkdir ${BASE_DIR}
+ENV TESSDATA_PREFIX /usr/local/share/tessdata
 RUN mkdir ${TESSDATA_PREFIX}
 
-RUN git clone ${LEP_REPO_URL} ${LEP_SRC_DIR} && \
-    cd ${LEP_SRC_DIR} && git checkout ${LEPTONICA_CHECKOUT} && \ 
-    mkdir -p ./cmake_build && cd ./cmake_build && \
-    cmake .. -DCMAKE_INSTALL_PREFIX=${INSTALL_LOCATION} && \
-    make -j${CPU_CORE} && \
-    make install && \
-    ldconfig
-
-RUN git clone ${TES_REPO_URL} ${TES_SRC_DIR} && \
-    cd ${TES_SRC_DIR} && git checkout ${TESSERACT_CHECKOUT} 
 
 # osd	Orientation and script detection
 RUN wget -O ${TESSDATA_PREFIX}/osd.traineddata https://github.com/tesseract-ocr/tessdata/raw/3.04.00/osd.traineddata
