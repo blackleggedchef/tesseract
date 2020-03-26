@@ -40,6 +40,7 @@ RUN apt-get install -y libjsoncpp-dev autoconf automake libtool curl make g++ un
     ldconfig && \
     rm -rf ${G3LOG_SETUP_PATH}
 
+	
 
 RUN apt-get install -y \
 	autoconf \
